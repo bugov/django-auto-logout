@@ -6,7 +6,7 @@ django-auto-logout
 
 Auto logout a user after specific time in Django.
 
-Works with Python ≥ 3.5, Django ≥ 3.0.
+Works with Python ≥ 3.7, Django ≥ 3.0.
 
 Installation
 ------------
