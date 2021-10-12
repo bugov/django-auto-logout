@@ -12,6 +12,8 @@ def read(file_name):
 
 requires = [
     'django',
+    'setuptools',
+    'wheel',
 ]
 tests_require = requires + [
     'coverage',
@@ -32,9 +34,13 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Framework :: Django',
+        'Framework :: Django :: 3.0',
+        'Framework :: Django :: 3.1',
         'Framework :: Django :: 3.2',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
     ],
