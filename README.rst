@@ -1,7 +1,8 @@
 django-auto-logout
 ==================
 
-.. figure:: https://travis-ci.org/bugov/django-auto-logout.svg?branch=master
+.. image:: https://app.travis-ci.com/bugov/django-auto-logout.svg?branch=master
+    :target: https://app.travis-ci.com/bugov/django-auto-logout
 
 Auto logout a user after specific time in Django.
 
