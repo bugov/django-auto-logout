@@ -1,0 +1,7 @@
+/.*
+!.gitignore
+!.travis.yml
+__pycache__
+*.egg-info
+venv
+htmlcov
