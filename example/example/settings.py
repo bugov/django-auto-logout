@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
     'django_auto_logout.middleware.auto_logout',
 ]
 
@@ -161,3 +162,7 @@ LOGIN_URL = '/login/'
 
 
 # DJANGO AUTO LOGIN
+AUTO_LOGOUT = {
+    'IDLE_TIME': 300,  # 5 minutes
+    'SESSION_TIME': 1800,  # 30 minutes
+}
