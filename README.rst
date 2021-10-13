@@ -9,7 +9,7 @@ Auto logout a user after specific time in Django.
 Works with Python🐍 ≥ 3.7, Django🌐 ≥ 3.0.
 
 ✔️ Installation
-----------------
+---------------------
 
 .. code:: bash
 
@@ -33,7 +33,7 @@ Append to `settings` middlewares:
     - `django.contrib.messages.middleware.MessageMiddleware`
 
 💤 Logout in case of idle
-------------------------
+-----------------------------
 
 Logout a user if there are no requests for a long time.
 
@@ -45,7 +45,7 @@ Add to `settings`:
 
 
 ⌛ Limit session time
---------------------
+------------------------
 
 Logout a user after 3600 seconds (hour) from the last login.
 
@@ -56,7 +56,7 @@ Add to `settings`:
     AUTO_LOGOUT = {'SESSION_TIME': 3600}
 
 ✉️ Show messages when logging out automatically
-------------------------------------------------
+-----------------------------------------------------
 
 Set the message that will be displayed after the user automatically logs out of the system:
 
@@ -84,7 +84,7 @@ It uses `django.contrib.messages`. Don't forget to display messages in templates
     See `TEMPLATES` → `OPTIONS` → `context_processors` in your `settings.py` file.
 
 🌈 Combine configurations
-------------------------
+----------------------------
 
 You can combine previous configurations. For example, you may want to logout a user
 in case of downtime (5 minutes or more) and not allow working within one session

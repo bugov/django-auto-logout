@@ -27,6 +27,7 @@ setup(
     author_email='georgy.bazhukov@gmail.com',
     description='Auto logout a user after specific time in Django',
     long_description=read('README.rst'),
+    long_description_content_type='text/x-rst',
     url='https://github.com/bugov/django-auto-logout',
     packages=find_packages(),
     include_package_data=True,
