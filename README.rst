@@ -25,6 +25,18 @@ Append to `settings` middlewares:
         'django_auto_logout.middleware.auto_logout',
     )
 
+Logout in case of idle
+----------------------
+
+Logout a user if there are no requests for a long time.
+
+Add to `settings`:
+
+.. code:: python
+
+    AUTO_LOGOUT = {'IDLE_TIME': 600}  # logout after 10 minutes of downtime
+
+
 Limit session time
 ------------------
 
@@ -35,3 +47,18 @@ Add to `settings`:
 .. code:: python
 
     AUTO_LOGOUT = {'SESSION_TIME': 3600}
+
+Combine configurations
+----------------------
+
+You can combine previous configurations. For example, you may want to logout a user
+in case of downtime (5 minutes or more) and not allow working within one session
+for more than half an hour:
+
+
+.. code:: python
+
+    AUTO_LOGOUT = {
+        'IDLE_TIME': 300,  # 5 minutes
+        'SESSION_TIME': 1800,  # 30 minutes
+    }
