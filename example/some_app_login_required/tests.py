@@ -15,10 +15,13 @@ class TestAutoLogout(TestCase):
     def assertLoginRequiredIsOk(self):
         resp = self.client.get(self.url)
         self.assertContains(resp, 'login required view', msg_prefix='Fine with authorized')
+        return resp
 
     def assertLoginRequiredRedirect(self):
         resp = self.client.get(self.url)
-        self.assertRedirects(resp, f'{settings.LOGIN_URL}?next={self.url}', msg_prefix='Redirect for anonymous')
+        self.assertEqual(resp.status_code, 302, msg='Redirect for anonymous')
+        self.assertEqual(resp['location'], f'{settings.LOGIN_URL}?next={self.url}')
+        return resp
 
     def _logout_session_time(self):
         settings.AUTO_LOGOUT = {'SESSION_TIME': 1}
@@ -102,3 +105,38 @@ class TestAutoLogout(TestCase):
         self.assertLoginRequiredIsOk()
         sleep(1)
         self.assertLoginRequiredRedirect()
+
+    def test_message_on_auto_logout(self):
+        settings.AUTO_LOGOUT = {
+            'SESSION_TIME': 1,
+            'MESSAGE': 'The session has expired. Please login again to continue.',
+        }
+        self.client.force_login(self.user)
+        self.assertLoginRequiredIsOk()
+        sleep(1)
+        resp = self.assertLoginRequiredRedirect()
+
+        # display message after redirect
+        resp = self.client.get(resp['location'])
+        self.assertContains(resp, 'login page', msg_prefix=resp.content.decode())
+        self.assertContains(resp, 'class="message info"', msg_prefix=resp.content.decode())
+        self.assertContains(resp, settings.AUTO_LOGOUT['MESSAGE'])
+
+        # message displays only once
+        resp = self.assertLoginRequiredRedirect()
+        resp = self.client.get(resp['location'])
+        self.assertContains(resp, 'login page', msg_prefix=resp.content.decode())
+        self.assertNotContains(resp, 'class="message info"', msg_prefix=resp.content.decode())
+
+    def test_no_messages_if_no_messages(self):
+        settings.AUTO_LOGOUT = {
+            'SESSION_TIME': 1,
+            'MESSAGE': None,
+        }
+        self.client.force_login(self.user)
+        self.assertLoginRequiredIsOk()
+        sleep(1)
+        resp = self.assertLoginRequiredRedirect()
+        resp = self.client.get(resp['location'])
+        self.assertContains(resp, 'login page', msg_prefix=resp.content.decode())
+        self.assertNotContains(resp, 'class="message info"', msg_prefix=resp.content.decode())

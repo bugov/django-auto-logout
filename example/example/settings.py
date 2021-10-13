@@ -163,6 +163,7 @@ LOGIN_URL = '/login/'
 
 # DJANGO AUTO LOGIN
 AUTO_LOGOUT = {
-    'IDLE_TIME': 300,  # 5 minutes
-    'SESSION_TIME': 1800,  # 30 minutes
+    'IDLE_TIME': 10,  # 10 seconds
+    'SESSION_TIME': 120,  # 2 minutes
+    'MESSAGE': 'The session has expired. Please login again to continue.',
 }

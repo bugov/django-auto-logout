@@ -4,6 +4,7 @@ from typing import Callable
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import get_user_model, logout
+from django.contrib.messages import info
 from pytz import timezone
 
 UserModel = get_user_model()
@@ -46,6 +47,9 @@ def _auto_logout(request: HttpRequest, options):
     if should_logout:
         logger.debug('Logout user %s', user)
         logout(request)
+
+        if options.get('MESSAGE') is not None:
+            info(request, options['MESSAGE'])
 
 
 def auto_logout(get_response: Callable[[HttpRequest], HttpResponse]) -> Callable:
