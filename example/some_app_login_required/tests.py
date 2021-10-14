@@ -1,4 +1,5 @@
 from time import sleep
+from datetime import timedelta
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -24,7 +25,6 @@ class TestAutoLogout(TestCase):
         return resp
 
     def _logout_session_time(self):
-        settings.AUTO_LOGOUT = {'SESSION_TIME': 1}
         self.assertLoginRequiredRedirect()
 
         self.client.force_login(self.user)
@@ -34,20 +34,38 @@ class TestAutoLogout(TestCase):
         self.assertLoginRequiredRedirect()
 
     def test_logout_session_time(self):
+        settings.AUTO_LOGOUT = {'SESSION_TIME': 1}
         settings.USE_TZ = False
         self._logout_session_time()
 
     def test_logout_session_time_using_tz_utc(self):
+        settings.AUTO_LOGOUT = {'SESSION_TIME': 1}
         settings.USE_TZ = True
         self._logout_session_time()
 
     def test_logout_session_time_using_tz_non_utc(self):
+        settings.AUTO_LOGOUT = {'SESSION_TIME': 1}
         settings.USE_TZ = True
         settings.TIME_ZONE = 'Asia/Yekaterinburg'
         self._logout_session_time()
 
-    def test_logout_idle_time_no_idle(self):
-        settings.AUTO_LOGOUT = {'IDLE_TIME': 1}
+    def test_logout_session_time_timedelta(self):
+        settings.AUTO_LOGOUT = {'SESSION_TIME': timedelta(seconds=1)}
+        settings.USE_TZ = False
+        self._logout_session_time()
+
+    def test_logout_session_time_using_tz_utc_timedelta(self):
+        settings.AUTO_LOGOUT = {'SESSION_TIME': timedelta(seconds=1)}
+        settings.USE_TZ = True
+        self._logout_session_time()
+
+    def test_logout_session_time_using_tz_non_utc_timedelta(self):
+        settings.AUTO_LOGOUT = {'SESSION_TIME': timedelta(seconds=1)}
+        settings.USE_TZ = True
+        settings.TIME_ZONE = 'Asia/Yekaterinburg'
+        self._logout_session_time()
+
+    def _test_logout_idle_time_no_idle(self):
         self.client.force_login(self.user)
         self.assertLoginRequiredIsOk()
 
@@ -55,13 +73,28 @@ class TestAutoLogout(TestCase):
             sleep(0.5)
             self.assertLoginRequiredIsOk()
 
-    def test_logout_idle_time(self):
+    def test_logout_idle_time_no_idle(self):
         settings.AUTO_LOGOUT = {'IDLE_TIME': 1}
+        self._test_logout_idle_time_no_idle()
+
+    def test_logout_idle_time_no_idle_timedelta(self):
+        settings.AUTO_LOGOUT = {'IDLE_TIME': timedelta(seconds=1)}
+        self._test_logout_idle_time_no_idle()
+
+    def _test_logout_idle_time(self):
         self.client.force_login(self.user)
         self.assertLoginRequiredIsOk()
 
         sleep(1.5)
         self.assertLoginRequiredRedirect()
+
+    def test_logout_idle_time(self):
+        settings.AUTO_LOGOUT = {'IDLE_TIME': 1}
+        self._test_logout_idle_time()
+
+    def test_logout_idle_time_timedelta(self):
+        settings.AUTO_LOGOUT = {'IDLE_TIME': timedelta(seconds=1)}
+        self._test_logout_idle_time()
 
     def test_combine_idle_and_session_time(self):
         settings.AUTO_LOGOUT = {
@@ -80,6 +113,30 @@ class TestAutoLogout(TestCase):
         self.assertLoginRequiredIsOk()
         sleep(0.5)
         self.assertLoginRequiredRedirect()
+
+    def test_session_time_config_time(self):
+        settings.AUTO_LOGOUT = {
+            'IDLE_TIME': 1,
+            'SESSION_TIME': '2',
+        }
+
+        self.client.force_login(self.user)
+
+        exc_message = "AUTO_LOGOUT['SESSION_TIME'] should be `int` or `timedelta`, not `str`."
+        with self.assertRaisesMessage(TypeError, exc_message):
+            self.client.get('/login-required/')
+
+    def test_idle_time_config_time(self):
+        settings.AUTO_LOGOUT = {
+            'IDLE_TIME': '1',
+            'SESSION_TIME': 2,
+        }
+
+        self.client.force_login(self.user)
+
+        exc_message = "AUTO_LOGOUT['IDLE_TIME'] should be `int` or `timedelta`, not `str`."
+        with self.assertRaisesMessage(TypeError, exc_message):
+            self.client.get('/login-required/')
 
     def test_combine_idle_and_session_time_but_session_less_than_idle(self):
         settings.AUTO_LOGOUT = {
