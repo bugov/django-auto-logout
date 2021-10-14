@@ -24,6 +24,8 @@ class TestAutoLogout(TestCase):
         self.assertEqual(resp['location'], f'{settings.LOGIN_URL}?next={self.url}')
         return resp
 
+
+class TestAutoLogoutSessionTime(TestAutoLogout):
     def _logout_session_time(self):
         self.assertLoginRequiredRedirect()
 
@@ -65,6 +67,20 @@ class TestAutoLogout(TestCase):
         settings.TIME_ZONE = 'Asia/Yekaterinburg'
         self._logout_session_time()
 
+    def test_session_time_wrong_type(self):
+        settings.AUTO_LOGOUT = {
+            'IDLE_TIME': 1,
+            'SESSION_TIME': '2',
+        }
+
+        self.client.force_login(self.user)
+
+        exc_message = "AUTO_LOGOUT['SESSION_TIME'] should be `int` or `timedelta`, not `str`."
+        with self.assertRaisesMessage(TypeError, exc_message):
+            self.client.get(self.url)
+
+
+class TestAutoLogoutIdleTime(TestAutoLogout):
     def _test_logout_idle_time_no_idle(self):
         self.client.force_login(self.user)
         self.assertLoginRequiredIsOk()
@@ -96,6 +112,20 @@ class TestAutoLogout(TestCase):
         settings.AUTO_LOGOUT = {'IDLE_TIME': timedelta(seconds=1)}
         self._test_logout_idle_time()
 
+    def test_idle_time_wrong_type(self):
+        settings.AUTO_LOGOUT = {
+            'IDLE_TIME': '1',
+            'SESSION_TIME': 2,
+        }
+
+        self.client.force_login(self.user)
+
+        exc_message = "AUTO_LOGOUT['IDLE_TIME'] should be `int` or `timedelta`, not `str`."
+        with self.assertRaisesMessage(TypeError, exc_message):
+            self.client.get(self.url)
+
+
+class TestAutoLogoutCombineConfigs(TestAutoLogout):
     def test_combine_idle_and_session_time(self):
         settings.AUTO_LOGOUT = {
             'IDLE_TIME': 1,
@@ -113,30 +143,6 @@ class TestAutoLogout(TestCase):
         self.assertLoginRequiredIsOk()
         sleep(0.5)
         self.assertLoginRequiredRedirect()
-
-    def test_session_time_config_time(self):
-        settings.AUTO_LOGOUT = {
-            'IDLE_TIME': 1,
-            'SESSION_TIME': '2',
-        }
-
-        self.client.force_login(self.user)
-
-        exc_message = "AUTO_LOGOUT['SESSION_TIME'] should be `int` or `timedelta`, not `str`."
-        with self.assertRaisesMessage(TypeError, exc_message):
-            self.client.get('/login-required/')
-
-    def test_idle_time_config_time(self):
-        settings.AUTO_LOGOUT = {
-            'IDLE_TIME': '1',
-            'SESSION_TIME': 2,
-        }
-
-        self.client.force_login(self.user)
-
-        exc_message = "AUTO_LOGOUT['IDLE_TIME'] should be `int` or `timedelta`, not `str`."
-        with self.assertRaisesMessage(TypeError, exc_message):
-            self.client.get('/login-required/')
 
     def test_combine_idle_and_session_time_but_session_less_than_idle(self):
         settings.AUTO_LOGOUT = {
@@ -163,6 +169,8 @@ class TestAutoLogout(TestCase):
         sleep(1)
         self.assertLoginRequiredRedirect()
 
+
+class TestAutoLogoutMessage(TestAutoLogout):
     def test_message_on_auto_logout(self):
         settings.AUTO_LOGOUT = {
             'SESSION_TIME': 1,
