@@ -103,6 +103,62 @@ See `TEMPLATES` → `OPTIONS` → `context_processors` in your `settings.py` fil
 
 ---
 
+## ✨ Logout a user when all his tabs are closed
+
+If all tabs are closed or if the browser is closed, actually...
+
+Add to `AUTO_LOGOUT` settings:
+
+```python
+AUTO_LOGOUT['LOGOUT_ON_TABS_CLOSED'] = True
+```
+
+Also for this option you should add a context processor:
+
+```python
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+
+                # ↓↓↓ Add this ↓↓↓
+                'django_auto_logout.context_processors.logout_on_tabs_closed',
+            ],
+        },
+    },
+]
+```
+
+Add `logout_on_tabs_closed` variable to your template layout:
+
+```
+{{ logout_on_tabs_closed }}
+```
+
+It works for almost all browsers on 🖥️:
+
+- IE ≥ 8
+- Edge ≥ 12
+- Firefox ≥ 3.5
+- Chrome ≥ 4
+- Safari ≥ 4
+- Opera ≥ 11.5
+
+And 📱 browsers:
+
+- iOS Safari ≥ 3.2
+- Android Browser ≥ 94
+- Android Chrome ≥ 94
+- Android Firefox ≥ 92
+- Opera Mobile ≥ 12
+
 ## 🌈 Combine configurations
 
 You can combine previous configurations. For example, you may want to logout a user
@@ -115,6 +171,7 @@ from datetime import timedelta
 AUTO_LOGOUT = {
     'IDLE_TIME': timedelta(minutes=5),
     'SESSION_TIME': timedelta(minutes=30),
+    'LOGOUT_ON_TABS_CLOSED': True,
     'MESSAGE': 'The session has expired. Please login again to continue.',
 }
 ```
