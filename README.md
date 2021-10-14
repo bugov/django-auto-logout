@@ -45,15 +45,30 @@ Add to `settings.py`:
 AUTO_LOGOUT = {'IDLE_TIME': 600}  # logout after 10 minutes of downtime
 ```
 
+or the same, but with `datetime.timedelta` (more semantically):
+
+```python
+from datetime import timedelta
+
+AUTO_LOGOUT = {'IDLE_TIME': timedelta(minutes=10)}
+```
+
 ## ⌛ Limit session time
 
 Logout a user after 3600 seconds (hour) from the last login.
 
 Add to `settings.py`:
 
-
 ```python
 AUTO_LOGOUT = {'SESSION_TIME': 3600}
+```
+
+or the same, but with `datetime.timedelta` (more semantically):
+
+```python
+from datetime import timedelta
+
+AUTO_LOGOUT = {'SESSION_TIME': timedelta(hours=1)}
 ```
 
 ## ✉️ Show messages when logging out automatically
@@ -95,9 +110,11 @@ in case of downtime (5 minutes or more) and not allow working within one session
 for more than half an hour:
 
 ```python
+from datetime import timedelta
+
 AUTO_LOGOUT = {
-    'IDLE_TIME': 300,  # 5 minutes
-    'SESSION_TIME': 1800,  # 30 minutes
+    'IDLE_TIME': timedelta(minutes=5),
+    'SESSION_TIME': timedelta(minutes=30),
     'MESSAGE': 'The session has expired. Please login again to continue.',
 }
 ```
