@@ -212,6 +212,7 @@ class TestAutoLogoutMessage(TestAutoLogout):
 try:
     from selenium.webdriver.firefox.webdriver import WebDriver
     from selenium.webdriver.common.by import By
+    from selenium.webdriver.common.keys import Keys
 except ImportError:
     skip_selenium = True
 else:
@@ -256,5 +257,14 @@ class TestBrowser(StaticLiveServerTestCase):
         sleep(0.5)
         self.assertIn('login required page', self.browser.title)
         sleep(0.5)
+        self.browser.get(f'{self.live_server_url}{self.url}')
+        self.assertIn('login page', self.browser.title)
+
+    def test_logout_on_tab_closed(self):
+        settings.AUTO_LOGOUT['LOGOUT_ON_TABS_CLOSED'] = True
+        self._login_user()
+        self.assertIn('login required page', self.browser.title)
+        self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + 'w')
+        self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.SHIFT + 't')
         self.browser.get(f'{self.live_server_url}{self.url}')
         self.assertIn('login page', self.browser.title)
