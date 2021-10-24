@@ -1,8 +1,10 @@
 from time import sleep
 from datetime import timedelta
+from unittest import skipIf
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 UserModel = get_user_model()
 
@@ -205,3 +207,54 @@ class TestAutoLogoutMessage(TestAutoLogout):
         resp = self.client.get(resp['location'])
         self.assertContains(resp, 'login page', msg_prefix=resp.content.decode())
         self.assertNotContains(resp, 'class="message info"', msg_prefix=resp.content.decode())
+
+
+try:
+    from selenium.webdriver.firefox.webdriver import WebDriver
+    from selenium.webdriver.common.by import By
+except ImportError:
+    skip_selenium = True
+else:
+    skip_selenium = False
+
+
+@skipIf(skip_selenium, 'No selenium')
+class TestBrowser(StaticLiveServerTestCase):
+    browser: WebDriver
+    url = '/login-required/'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.browser = WebDriver()
+        cls.browser.implicitly_wait(10)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.quit()
+        super().tearDownClass()
+
+    def setUp(self) -> None:
+        self.user = UserModel.objects.create_user('user', 'user@localhost', 'pass')
+        self.superuser = UserModel.objects.create_superuser('superuser', 'superuser@localhost', 'pass')
+
+    def _login_user(self):
+        self.browser.get(f'{self.live_server_url}{settings.LOGIN_URL}')
+        username_input = self.browser.find_element(By.CSS_SELECTOR, "input[name=username]")
+        username_input.send_keys('user')
+        password_input = self.browser.find_element(By.CSS_SELECTOR, "input[name=password]")
+        password_input.send_keys('pass')
+        self.browser.find_element(By.CSS_SELECTOR, 'button[type=submit]').click()
+
+    def test_can_open_browser(self):
+        self.browser.get(f'{self.live_server_url}{settings.LOGIN_URL}')
+        self.assertIn('login page', self.browser.title)
+
+    def test_auto_logout_session_time(self):
+        settings.AUTO_LOGOUT['SESSION_TIME'] = 1
+        self._login_user()
+        sleep(0.5)
+        self.assertIn('login required page', self.browser.title)
+        sleep(0.5)
+        self.browser.get(f'{self.live_server_url}{self.url}')
+        self.assertIn('login page', self.browser.title)

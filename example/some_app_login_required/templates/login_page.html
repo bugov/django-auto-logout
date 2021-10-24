@@ -1,7 +1,18 @@
 {% extends 'layout.html' %}
 
+{% block title %}login page{% endblock %}
+
 {% block content %}
-<p>
-    login page
-</p>
+<div class="box">
+    <h4 class="form-header">login page</h4>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        {{ form }}
+
+        <button type="submit" class="btn btn-primary btn-block">Log in</button>
+    </form>
+</div>
 {% endblock %}
