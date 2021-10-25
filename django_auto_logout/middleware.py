@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model, logout
 from django.contrib.messages import info
 from pytz import timezone
 
+LOGOUT_URL = settings.AUTO_LOGOUT.get('LOGOUT_URL', '/djal-send-logout/')
 UserModel = get_user_model()
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,11 @@ def _auto_logout(request: HttpRequest, options):
         now = datetime.now(tz=timezone(settings.TIME_ZONE))
     else:
         now = datetime.now()
+
+    if settings.AUTO_LOGOUT.get('LOGOUT_ON_TABS_CLOSED'):
+        if request.path == LOGOUT_URL and request.method.lower() == 'post':
+            should_logout |= True
+            logger.debug('Client requested for logout')
 
     if options.get('SESSION_TIME') is not None:
         if isinstance(options['SESSION_TIME'], timedelta):

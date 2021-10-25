@@ -129,7 +129,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 # ↓↓↓ Add this ↓↓↓
-                'django_auto_logout.context_processors.logout_on_tabs_closed',
+                'django_auto_logout.context_processors.auto_logout_client',
             ],
         },
     },
