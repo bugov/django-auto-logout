@@ -5,8 +5,6 @@ LOGOUT_URL = settings.AUTO_LOGOUT.get('LOGOUT_URL', '/djal-send-logout/')
 
 
 def trim(s: str) -> str:
-    if settings.DEBUG:
-        return s
     return ''.join([line.strip() for line in s.split('\n')])
 
 

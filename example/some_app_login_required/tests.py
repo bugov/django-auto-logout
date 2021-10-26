@@ -1,6 +1,6 @@
-from time import sleep
 from datetime import timedelta
-from unittest import skipIf, skip
+from time import sleep
+from unittest import skipIf
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -208,6 +208,8 @@ class TestAutoLogoutMessage(TestAutoLogout):
         self.assertContains(resp, 'login page', msg_prefix=resp.content.decode())
         self.assertNotContains(resp, 'class="message info"', msg_prefix=resp.content.decode())
 
+
+class TestAutoLogoutBrowserScript(TestAutoLogout):
     def test_logout_url_ok(self):
         settings.AUTO_LOGOUT['LOGOUT_ON_TABS_CLOSED'] = True
         self.client.force_login(self.user)
@@ -222,6 +224,21 @@ class TestAutoLogoutMessage(TestAutoLogout):
         self.client.post('/djal-send-logout/')
         self.assertLoginRequiredIsOk()
 
+    def test_check_script_inserted_not_ok(self):
+        settings.AUTO_LOGOUT['LOGOUT_ON_TABS_CLOSED'] = False
+        resp = self.client.get(settings.LOGIN_URL)
+        self.assertNotContains(resp, '<script>')
+
+    def test_check_script_inserted_ok(self):
+        settings.AUTO_LOGOUT['LOGOUT_ON_TABS_CLOSED'] = True
+        resp = self.client.get(settings.LOGIN_URL)
+        self.assertContains(resp, '<script>')
+
+    def test_check_script_inserted_ok_oneline(self):
+        settings.AUTO_LOGOUT['LOGOUT_ON_TABS_CLOSED'] = True
+        resp = self.client.get(settings.LOGIN_URL)
+        self.assertRegex(resp.content.decode(), r'<script>[^\n]+</script>')
+
 
 try:
     from selenium.webdriver.firefox.webdriver import WebDriver
@@ -235,7 +252,7 @@ else:
 
 @skipIf(skip_selenium, 'No selenium')
 class TestBrowser(StaticLiveServerTestCase):
-    browser: WebDriver
+    browser = None  # type: WebDriver
     url = '/login-required/'
 
     @classmethod
