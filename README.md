@@ -53,6 +53,56 @@ from datetime import timedelta
 AUTO_LOGOUT = {'IDLE_TIME': timedelta(minutes=10)}
 ```
 
+The user will log out the next time the page is requested.
+See `REDIRECT_TO_LOGIN_PAGE` to log out right after the idle-time has expired
+(and redirect to login page).
+
+### 🔄 `REDIRECT_TO_LOGIN_PAGE` right after the idle-time has expired
+
+Use the `REDIRECT_TO_LOGIN_PAGE` option
+if you want to redirect the user to the login page
+immediately after the idle-time expires:
+
+```python
+from datetime import timedelta
+
+AUTO_LOGOUT = {
+    'IDLE_TIME': timedelta(minutes=10),
+    'REDIRECT_TO_LOGIN_PAGE': True,
+}
+```
+
+This requires a client-side script, so you should
+modify your `context_processors` in `settings.py`:
+
+```python
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                # ↓↓↓ Add this ↓↓↓
+                'django_auto_logout.context_processors.auto_logout_client',
+            ],
+        },
+    },
+]
+```
+
+And add it to your templates (will add a redirect script to your html):
+
+```
+{{ redirect_to_login_page }}
+```
+
+It also works with `SESSION_TIME`.
+
 ## ⌛ Limit session time
 
 Logout a user after 3600 seconds (hour) from the last login.
@@ -70,6 +120,16 @@ from datetime import timedelta
 
 AUTO_LOGOUT = {'SESSION_TIME': timedelta(hours=1)}
 ```
+
+---
+
+**NOTE**
+
+See `REDIRECT_TO_LOGIN_PAGE` option
+if you want to redirect user to the login page
+right after the idle-time has expired.
+
+---
 
 ## ✉️ Show messages when logging out automatically
 
