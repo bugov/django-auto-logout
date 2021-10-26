@@ -2,3 +2,4 @@
 build>=0.7.0
 coverage>=6.0.2
 tox>=3.24.4
+# selenium>=4.0.0
