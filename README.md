@@ -103,7 +103,7 @@ See `TEMPLATES` → `OPTIONS` → `context_processors` in your `settings.py` fil
 
 ---
 
-## ✨ Logout a user when all his tabs are closed
+## ✨ Logout a user when all his tabs are closed (experimental)
 
 If all tabs are closed or if the browser is closed, actually...
 

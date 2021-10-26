@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import logging
-from typing import Callable
+from typing import Callable, Optional
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import get_user_model, logout
@@ -12,9 +12,10 @@ UserModel = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-def _auto_logout(request: HttpRequest, options):
+def _auto_logout(request: HttpRequest, options) -> Optional[HttpResponse]:
     user = request.user
     should_logout = False
+    replace_response: Optional[HttpResponse] = None
 
     if settings.USE_TZ:
         now = datetime.now(tz=timezone(settings.TIME_ZONE))
@@ -24,7 +25,8 @@ def _auto_logout(request: HttpRequest, options):
     if settings.AUTO_LOGOUT.get('LOGOUT_ON_TABS_CLOSED'):
         if request.path == LOGOUT_URL and request.method.lower() == 'post':
             should_logout |= True
-            logger.debug('Client requested for logout')
+            replace_response = HttpResponse()
+            logger.info('Client %r requested for logout', user)
 
     if options.get('SESSION_TIME') is not None:
         if isinstance(options['SESSION_TIME'], timedelta):
@@ -70,11 +72,15 @@ def _auto_logout(request: HttpRequest, options):
         if options.get('MESSAGE') is not None:
             info(request, options['MESSAGE'])
 
+    return replace_response
+
 
 def auto_logout(get_response: Callable[[HttpRequest], HttpResponse]) -> Callable:
     def middleware(request: HttpRequest) -> HttpResponse:
         if not request.user.is_anonymous and hasattr(settings, 'AUTO_LOGOUT'):
-            _auto_logout(request, settings.AUTO_LOGOUT)
+            replace_response = _auto_logout(request, settings.AUTO_LOGOUT)
+            if replace_response:
+                return replace_response
 
         return get_response(request)
     return middleware
