@@ -66,6 +66,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'django_auto_logout.context_processors.auto_logout_client',
             ],
         },
     },
@@ -159,11 +161,12 @@ LOGGING = {
 }
 
 LOGIN_URL = '/login/'
-
+LOGIN_REDIRECT_URL = '/login-required/'
 
 # DJANGO AUTO LOGIN
 AUTO_LOGOUT = {
     'IDLE_TIME': 10,  # 10 seconds
     'SESSION_TIME': 120,  # 2 minutes
     'MESSAGE': 'The session has expired. Please login again to continue.',
+    'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
 }
