@@ -8,7 +8,15 @@ Works with
 - Python🐍 ≥ 3.7,
 - Django🌐 ≥ 3.0.
 
-## ✔️ Installation
+Documentation:
+- [How to install](#installation)
+- User logout in case of:
+  - [downtime](#idle-time)
+  - [session duration limitation](#session-time)
+- [Auto-reload the browser page when the time runs out](#reload)
+- [Add a message for informing a user about logout](#message)
+
+##<a name="installation"></a> ✔️ Installation
 
 ```bash
 pip install django-auto-logout
@@ -35,7 +43,7 @@ Make sure that the following middlewares are used before doing this:
 
 ---
 
-## 💤 Logout in case of idle
+##<a name="idle-time"></a> 💤 Logout in case of idle
 
 Logout a user if there are no requests for a long time.
 
@@ -57,7 +65,7 @@ The user will log out the next time the page is requested.
 See `REDIRECT_TO_LOGIN_IMMEDIATELY` to log out right after the idle-time has expired
 (and redirect to login page).
 
-### 🔄 `REDIRECT_TO_LOGIN_IMMEDIATELY` after the idle-time has expired
+###<a name="reload"></a> 🔄 `REDIRECT_TO_LOGIN_IMMEDIATELY` after the idle-time has expired
 
 Use the `REDIRECT_TO_LOGIN_IMMEDIATELY` option
 if you want to redirect the user to the login page
@@ -110,7 +118,7 @@ var idleEnd = {{ seconds_until_idle_end }};
 
 `REDIRECT_TO_LOGIN_IMMEDIATELY` works with `SESSION_TIME` too.
 
-## ⌛ Limit session time
+##<a name="session-time"></a> ⌛ Limit session time
 
 Logout a user after 3600 seconds (hour) from the last login.
 
@@ -138,7 +146,7 @@ right after the idle-time has expired.
 
 ---
 
-## ✉️ Show messages when logging out automatically
+##<a name="message"></a> ✉️ Show messages when logging out automatically
 
 Set the message that will be displayed after the user automatically logs out of the system:
 
