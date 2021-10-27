@@ -205,3 +205,59 @@ class TestAutoLogoutMessage(TestAutoLogout):
         resp = self.client.get(resp['location'])
         self.assertContains(resp, 'login page', msg_prefix=resp.content.decode())
         self.assertNotContains(resp, 'class="message info"', msg_prefix=resp.content.decode())
+
+
+class TestAutoLogoutRedirectToLoginPage(TestAutoLogout):
+    def test_script_anon(self):
+        settings.AUTO_LOGOUT = {
+            'IDLE_TIME': 10,  # 10 seconds
+            'SESSION_TIME': 120,  # 2 minutes
+            'REDIRECT_TO_LOGIN_PAGE': True,
+        }
+        resp = self.client.get(settings.LOGIN_URL)
+        self.assertNotContains(resp, '<script>')
+
+        self.client.force_login(self.user)
+        resp = self.client.get(settings.LOGIN_URL)
+        self.assertContains(resp, '<script>')
+
+    def test_session_idle_combinations(self):
+        self.client.force_login(self.user)
+
+        settings.AUTO_LOGOUT = {
+            'IDLE_TIME': 10,  # 10 seconds
+            'SESSION_TIME': 120,  # 2 minutes
+            'REDIRECT_TO_LOGIN_PAGE': True,
+        }
+        self.assertContains(self.client.get(self.url), '<script>')
+        self.assertContains(self.client.get(self.url), 'Math.min')
+
+        settings.AUTO_LOGOUT = {
+            'IDLE_TIME': 10,  # 10 seconds
+            'REDIRECT_TO_LOGIN_PAGE': True,
+        }
+        self.assertContains(self.client.get(self.url), '<script>')
+        self.assertNotContains(self.client.get(self.url), 'Math.min')
+
+        settings.AUTO_LOGOUT = {
+            'SESSION_TIME': 120,  # 2 minutes
+            'REDIRECT_TO_LOGIN_PAGE': True,
+        }
+        self.assertContains(self.client.get(self.url), '<script>')
+        self.assertNotContains(self.client.get(self.url), 'Math.min')
+
+        settings.AUTO_LOGOUT = {
+            'REDIRECT_TO_LOGIN_PAGE': True,
+        }
+        self.assertNotContains(self.client.get(self.url), '<script>')
+
+    def test_no_config(self):
+        self.client.force_login(self.user)
+
+        settings.AUTO_LOGOUT = {
+            'REDIRECT_TO_LOGIN_PAGE': False,
+        }
+        self.assertNotContains(self.client.get(self.url), '<script>')
+
+        settings.AUTO_LOGOUT = {}
+        self.assertNotContains(self.client.get(self.url), '<script>')

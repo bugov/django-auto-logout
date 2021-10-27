@@ -101,7 +101,14 @@ And add it to your templates (will add a redirect script to your html):
 {{ redirect_to_login_page }}
 ```
 
-It also works with `SESSION_TIME`.
+If you want to use this in your JavaScript code, following template variables will be useful:
+
+```
+var sessionEnd = {{ seconds_until_session_end }};
+var idleEnd = {{ seconds_until_idle_end }};
+```
+
+`REDIRECT_TO_LOGIN_PAGE` works with `SESSION_TIME` too.
 
 ## ⌛ Limit session time
 
@@ -176,5 +183,6 @@ AUTO_LOGOUT = {
     'IDLE_TIME': timedelta(minutes=5),
     'SESSION_TIME': timedelta(minutes=30),
     'MESSAGE': 'The session has expired. Please login again to continue.',
+    'REDIRECT_TO_LOGIN_PAGE': True,
 }
 ```

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
 {% for message in messages %}
@@ -11,6 +11,13 @@
     </div>
 {% endfor %}
 
+<p>
+    <a href="/login-required/">internal link</a>
+    <a href="https://github.com/bugov">external link</a>
+</p>
+
 {% block content %}{% endblock %}
+
+{{ redirect_to_login_page }}
 </body>
 </html>
