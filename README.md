@@ -14,7 +14,7 @@ Works with
   - [downtime](#idle-time)
   - [session duration limitation](#session-time)
 - [Auto-reload the browser page when the time runs out](#reload)
-- [Add a message for informing a user about logout](#message)
+- [Add a message to inform the user about logging out](#message)
 
 ## <a name="installation"></a>✔️ Installation
 
