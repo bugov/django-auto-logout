@@ -57,7 +57,7 @@ The user will log out the next time the page is requested.
 See `REDIRECT_TO_LOGIN_IMMEDIATELY` to log out right after the idle-time has expired
 (and redirect to login page).
 
-### 🔄 `REDIRECT_TO_LOGIN_IMMEDIATELY` right after the idle-time has expired
+### 🔄 `REDIRECT_TO_LOGIN_IMMEDIATELY` after the idle-time has expired
 
 Use the `REDIRECT_TO_LOGIN_IMMEDIATELY` option
 if you want to redirect the user to the login page
@@ -95,13 +95,13 @@ TEMPLATES = [
 ]
 ```
 
-And add it to your templates (will add a redirect script to your html):
+And add this to your templates (will add a redirect script to your html):
 
 ```
 {{ redirect_to_login_immediately }}
 ```
 
-If you want to use this in your JavaScript code, following template variables will be useful:
+If you want to use this in your JavaScript code, following template variables may be useful:
 
 ```
 var sessionEnd = {{ seconds_until_session_end }};
