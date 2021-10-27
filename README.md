@@ -54,12 +54,12 @@ AUTO_LOGOUT = {'IDLE_TIME': timedelta(minutes=10)}
 ```
 
 The user will log out the next time the page is requested.
-See `REDIRECT_TO_LOGIN_PAGE` to log out right after the idle-time has expired
+See `REDIRECT_TO_LOGIN_IMMEDIATELY` to log out right after the idle-time has expired
 (and redirect to login page).
 
-### 🔄 `REDIRECT_TO_LOGIN_PAGE` right after the idle-time has expired
+### 🔄 `REDIRECT_TO_LOGIN_IMMEDIATELY` right after the idle-time has expired
 
-Use the `REDIRECT_TO_LOGIN_PAGE` option
+Use the `REDIRECT_TO_LOGIN_IMMEDIATELY` option
 if you want to redirect the user to the login page
 immediately after the idle-time expires:
 
@@ -68,7 +68,7 @@ from datetime import timedelta
 
 AUTO_LOGOUT = {
     'IDLE_TIME': timedelta(minutes=10),
-    'REDIRECT_TO_LOGIN_PAGE': True,
+    'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
 }
 ```
 
@@ -98,7 +98,7 @@ TEMPLATES = [
 And add it to your templates (will add a redirect script to your html):
 
 ```
-{{ redirect_to_login_page }}
+{{ redirect_to_login_immediately }}
 ```
 
 If you want to use this in your JavaScript code, following template variables will be useful:
@@ -108,7 +108,7 @@ var sessionEnd = {{ seconds_until_session_end }};
 var idleEnd = {{ seconds_until_idle_end }};
 ```
 
-`REDIRECT_TO_LOGIN_PAGE` works with `SESSION_TIME` too.
+`REDIRECT_TO_LOGIN_IMMEDIATELY` works with `SESSION_TIME` too.
 
 ## ⌛ Limit session time
 
@@ -132,7 +132,7 @@ AUTO_LOGOUT = {'SESSION_TIME': timedelta(hours=1)}
 
 **NOTE**
 
-See `REDIRECT_TO_LOGIN_PAGE` option
+See `REDIRECT_TO_LOGIN_IMMEDIATELY` option
 if you want to redirect user to the login page
 right after the idle-time has expired.
 
@@ -183,6 +183,6 @@ AUTO_LOGOUT = {
     'IDLE_TIME': timedelta(minutes=5),
     'SESSION_TIME': timedelta(minutes=30),
     'MESSAGE': 'The session has expired. Please login again to continue.',
-    'REDIRECT_TO_LOGIN_PAGE': True,
+    'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
 }
 ```

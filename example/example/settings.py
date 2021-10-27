@@ -168,5 +168,5 @@ AUTO_LOGOUT = {
     'IDLE_TIME': 10,  # 10 seconds
     'SESSION_TIME': 120,  # 2 minutes
     'MESSAGE': 'The session has expired. Please login again to continue.',
-    'REDIRECT_TO_LOGIN_PAGE': True,
+    'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
 }

@@ -212,7 +212,7 @@ class TestAutoLogoutRedirectToLoginPage(TestAutoLogout):
         settings.AUTO_LOGOUT = {
             'IDLE_TIME': 10,  # 10 seconds
             'SESSION_TIME': 120,  # 2 minutes
-            'REDIRECT_TO_LOGIN_PAGE': True,
+            'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
         }
         resp = self.client.get(settings.LOGIN_URL)
         self.assertNotContains(resp, '<script>')
@@ -227,27 +227,27 @@ class TestAutoLogoutRedirectToLoginPage(TestAutoLogout):
         settings.AUTO_LOGOUT = {
             'IDLE_TIME': 10,  # 10 seconds
             'SESSION_TIME': 120,  # 2 minutes
-            'REDIRECT_TO_LOGIN_PAGE': True,
+            'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
         }
         self.assertContains(self.client.get(self.url), '<script>')
         self.assertContains(self.client.get(self.url), 'Math.min')
 
         settings.AUTO_LOGOUT = {
             'IDLE_TIME': 10,  # 10 seconds
-            'REDIRECT_TO_LOGIN_PAGE': True,
+            'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
         }
         self.assertContains(self.client.get(self.url), '<script>')
         self.assertNotContains(self.client.get(self.url), 'Math.min')
 
         settings.AUTO_LOGOUT = {
             'SESSION_TIME': 120,  # 2 minutes
-            'REDIRECT_TO_LOGIN_PAGE': True,
+            'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
         }
         self.assertContains(self.client.get(self.url), '<script>')
         self.assertNotContains(self.client.get(self.url), 'Math.min')
 
         settings.AUTO_LOGOUT = {
-            'REDIRECT_TO_LOGIN_PAGE': True,
+            'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
         }
         self.assertNotContains(self.client.get(self.url), '<script>')
 
@@ -255,7 +255,7 @@ class TestAutoLogoutRedirectToLoginPage(TestAutoLogout):
         self.client.force_login(self.user)
 
         settings.AUTO_LOGOUT = {
-            'REDIRECT_TO_LOGIN_PAGE': False,
+            'REDIRECT_TO_LOGIN_IMMEDIATELY': False,
         }
         self.assertNotContains(self.client.get(self.url), '<script>')
 

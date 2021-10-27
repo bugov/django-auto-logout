@@ -50,7 +50,7 @@ def auto_logout_client(request):
     if 'IDLE_TIME' in options:
         ctx['seconds_until_idle_end'] = seconds_until_idle_time_end(request, options['IDLE_TIME'], current_time)
 
-    if options.get('REDIRECT_TO_LOGIN_PAGE'):
+    if options.get('REDIRECT_TO_LOGIN_IMMEDIATELY'):
         at = None
 
         if 'SESSION_TIME' in options and 'IDLE_TIME' in options:
@@ -64,6 +64,6 @@ def auto_logout_client(request):
             at = f"at=Date.now()+Math.max({ ctx['seconds_until_idle_end'] },0)*1000+999;"
 
         if at:
-            ctx['redirect_to_login_page'] = mark_safe(_trim(LOGOUT_TIMEOUT_SCRIPT_PATTERN % at))
+            ctx['redirect_to_login_immediately'] = mark_safe(_trim(LOGOUT_TIMEOUT_SCRIPT_PATTERN % at))
 
     return ctx
