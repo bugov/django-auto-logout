@@ -1,18 +1,9 @@
 from datetime import datetime, timedelta
 from typing import Union
-from django.conf import settings
 from django.http import HttpRequest
-from pytz import timezone
+from django.utils.timezone import now
 
-
-def now() -> datetime:
-    """
-    Returns the current time with the Django project timezone.
-    :return: datetime
-    """
-    if settings.USE_TZ:
-        return datetime.now(tz=timezone(settings.TIME_ZONE))
-    return datetime.now()
+now = now
 
 
 def seconds_until_session_end(
