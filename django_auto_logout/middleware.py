@@ -2,12 +2,11 @@ import logging
 from typing import Callable
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import logout
 from django.contrib.messages import info
 
 from .utils import now, seconds_until_idle_time_end, seconds_until_session_end
 
-UserModel = get_user_model()
 logger = logging.getLogger(__name__)
 
 
