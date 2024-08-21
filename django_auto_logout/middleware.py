@@ -1,5 +1,5 @@
 import logging
-from typing import Callable
+from typing import Callable, Optional
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import logout
@@ -10,7 +10,14 @@ from .utils import now, seconds_until_idle_time_end, seconds_until_session_end
 logger = logging.getLogger(__name__)
 
 
-def _auto_logout(request: HttpRequest, options):
+def _do_logout(request: HttpRequest, options) -> None:
+    logout(request)
+
+    if 'MESSAGE' in options:
+        info(request, options['MESSAGE'])
+
+
+def _auto_logout(request: HttpRequest, options) -> Optional[HttpResponse]:
     should_logout = False
     current_time = now()
 
@@ -31,16 +38,14 @@ def _auto_logout(request: HttpRequest, options):
 
     if should_logout:
         logger.debug('Logout user %s', request.user)
-        logout(request)
-
-        if 'MESSAGE' in options:
-            info(request, options['MESSAGE'])
+        return _do_logout(request, options)
 
 
 def auto_logout(get_response: Callable[[HttpRequest], HttpResponse]) -> Callable:
     def middleware(request: HttpRequest) -> HttpResponse:
+        response = None
         if not request.user.is_anonymous and hasattr(settings, 'AUTO_LOGOUT'):
-            _auto_logout(request, settings.AUTO_LOGOUT)
+            response = _auto_logout(request, settings.AUTO_LOGOUT)
 
-        return get_response(request)
+        return response or get_response(request)
     return middleware
