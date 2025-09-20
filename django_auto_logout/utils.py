@@ -24,7 +24,7 @@ def seconds_until_session_end(
         ttl = timedelta(seconds=session_time)
     else:
         raise TypeError(f"AUTO_LOGOUT['SESSION_TIME'] should be `int` or `timedelta`, "
-                        f"not `{type(session_time).__name__}`.")
+                        f"not `{type(session_time).__name__}` ({session_time}).")
 
     return (request.user.last_login - current_time + ttl).total_seconds()
 

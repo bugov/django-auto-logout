@@ -18,7 +18,7 @@ LOGOUT_TIMEOUT_SCRIPT_PATTERN = """
                 }
                 else {
                     delete s['djalLogoutAt'];
-                    w.location.reload();
+                    w.location.replace(w.location.href);
                 }
             }
             
