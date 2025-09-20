@@ -1,17 +1,25 @@
 import logging
-from typing import Callable
+from typing import Any, Callable, Optional
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import logout
 from django.contrib.messages import info
+from django.utils.module_loading import import_string
 
 from .utils import now, seconds_until_idle_time_end, seconds_until_session_end
 
-UserModel = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-def _auto_logout(request: HttpRequest, options):
+def _do_logout(request: HttpRequest, options) -> None:
+    logout(request)
+
+    if 'MESSAGE' in options:
+        info(request, options['MESSAGE'])
+
+
+def _auto_logout(request: HttpRequest, options) -> Optional[HttpResponse]:
     should_logout = False
     current_time = now()
 
@@ -32,16 +40,27 @@ def _auto_logout(request: HttpRequest, options):
 
     if should_logout:
         logger.debug('Logout user %s', request.user)
-        logout(request)
-
-        if 'MESSAGE' in options:
-            info(request, options['MESSAGE'])
+        logout_func = options.get('CUSTOM_LOGOUT_FUNC', _do_logout)
+        return logout_func(request, options)
 
 
 def auto_logout(get_response: Callable[[HttpRequest], HttpResponse]) -> Callable:
-    def middleware(request: HttpRequest) -> HttpResponse:
-        if not request.user.is_anonymous and hasattr(settings, 'AUTO_LOGOUT'):
-            _auto_logout(request, settings.AUTO_LOGOUT)
+    options: Optional[dict[str, Any]] = getattr(settings, 'AUTO_LOGOUT', None)
+    if not options:
+        logger.warning('Auto logout settings are not specified')
+    elif 'CUSTOM_LOGOUT_FUNC' in options:
+        custom_logout_func_value = options['CUSTOM_LOGOUT_FUNC']
+        if isinstance(custom_logout_func_value, str):
+            options['CUSTOM_LOGOUT_FUNC'] = import_string(custom_logout_func_value)
 
-        return get_response(request)
+        if not callable(options['CUSTOM_LOGOUT_FUNC']):
+            raise ImproperlyConfigured("CUSTOM_LOGOUT_FUNC should be a function")
+
+    def middleware(request: HttpRequest) -> HttpResponse:
+        response = None
+        if not request.user.is_anonymous and options is not None:
+            response = _auto_logout(request, options)
+
+        return response or get_response(request)
+
     return middleware
