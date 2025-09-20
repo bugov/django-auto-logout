@@ -1,3 +1,4 @@
+import logging
 from time import sleep
 from datetime import timedelta
 from django.test import TestCase
@@ -5,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 UserModel = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class TestAutoLogout(TestCase):
@@ -68,6 +70,7 @@ class TestAutoLogoutSessionTime(TestAutoLogout):
         self._logout_session_time()
 
     def test_session_time_wrong_type(self):
+        logger.info("FYI! IT'S OK - BEGIN (Session time is wrong)")
         settings.AUTO_LOGOUT = {
             'IDLE_TIME': 1,
             'SESSION_TIME': '2',
@@ -75,10 +78,13 @@ class TestAutoLogoutSessionTime(TestAutoLogout):
 
         self.client.force_login(self.user)
 
-        exc_message = "AUTO_LOGOUT['SESSION_TIME'] should be `int` or `timedelta`, not `str`."
-        with self.assertRaisesMessage(TypeError, exc_message):
+        with self.assertRaisesRegex(
+            TypeError,
+            r"AUTO_LOGOUT\['SESSION_TIME'\] should be `int` or `timedelta`, not `str` \(.*?\)\."
+        ):
             self.client.get(self.url)
 
+        logger.info("FYI! IT'S OK - END (Session time is wrong)")
 
 class TestAutoLogoutIdleTime(TestAutoLogout):
     def _test_logout_idle_time_no_idle(self):
@@ -113,6 +119,7 @@ class TestAutoLogoutIdleTime(TestAutoLogout):
         self._test_logout_idle_time()
 
     def test_idle_time_wrong_type(self):
+        logger.info("FYI! IT'S OK - BEGIN (Checking wrong case)")
         settings.AUTO_LOGOUT = {
             'IDLE_TIME': '1',
             'SESSION_TIME': 2,
@@ -123,6 +130,8 @@ class TestAutoLogoutIdleTime(TestAutoLogout):
         exc_message = "AUTO_LOGOUT['IDLE_TIME'] should be `int` or `timedelta`, not `str`."
         with self.assertRaisesMessage(TypeError, exc_message):
             self.client.get(self.url)
+
+        logger.info("FYI! IT'S OK - END (Checking wrong case)")
 
 
 class TestAutoLogoutCombineConfigs(TestAutoLogout):
